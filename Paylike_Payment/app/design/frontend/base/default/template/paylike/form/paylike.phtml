@@ -165,28 +165,44 @@ if ( Mage::getStoreConfig( 'payment/paylike/status' ) ) {
             },100);
         }
 
-        // this section is no longer use for now
-        var paylikeoscOldPlaceOrder;
-        jQuery(document).ready(function ($) {
-            if (typeof window.oscPlaceOrder === 'function') {
-                paylikeoscOldPlaceOrder = window.oscPlaceOrder;
-                window.oscPlaceOrder = function (element) {
-                    var validator = new Validation('one-step-checkout-form');
-                    if (validator.validate()) {
-                        if (jQuery('.ajax-loader1:visible').length > 0 || jQuery('.ajax-loader2:visible').length > 0 || jQuery('.ajax-loader3:visible').length > 0) {
-                            alert(notReadyMessage);
-                        } else {
-                            var currentShipmentCode = jQuery('input[name="shipping_method"]:checked').val();
-                            if (currentShipmentCode != window.paylikeSelectedMethodOfShipping) {
-                                alert(notReadyMessage);
-                            } else {
-                                validatePaylike(2, element);
-                            }
-                        }
-                    } else {
+        function getFormElementId() {
+          if (document.getElementById("one-step-checkout-form")) {
+            return "one-step-checkout-form";
+          }
+
+          if (document.getElementById("amscheckout-onepage")) {
+            return "amscheckout-onepage";
+          }
+        }
+
+        let oldPlaceOrder = undefined;
+        const paylikePlaceOrder = function (element) {
+            var validator = new Validation(getFormElementId);
+            if (validator.validate()) {
+                if (jQuery('.ajax-loader1:visible').length > 0 || jQuery('.ajax-loader2:visible').length > 0 || jQuery('.ajax-loader3:visible').length > 0) {
+                    alert(notReadyMessage);
+                } else {
+                    var currentShipmentCode = jQuery('input[name="shipping_method"]:checked').val();
+                    if (currentShipmentCode != window.paylikeSelectedMethodOfShipping) {
                         alert(notReadyMessage);
+                    } else {
+                        validatePaylike(2, element);
                     }
                 }
+            } else {
+                alert(notReadyMessage);
+            }
+        };
+
+        jQuery(document).ready(function ($) {
+            if (typeof window.oscPlaceOrder === 'function') {
+                oldPlaceOrder = window.oscPlaceOrder;
+                window.oscPlaceOrder = paylikePlaceOrder
+            }
+
+            if (typeof window.completeCheckout === 'function') {
+                oldPlaceOrder = window.completeCheckout;
+                window.completeCheckout = newPlaceOrder;
             }
         });
 
@@ -233,7 +249,11 @@ if ( Mage::getStoreConfig( 'payment/paylike/status' ) ) {
                     }
 
                     if (!paylikeVAR.email || !paylikeVAR.email.trim()) {
+                      if (document.getElementById("amasty-scheckout-login-email")) {
+                        paylikeVAR.email = document.querySelector("#amasty-scheckout-login-email").value;
+                      } else {
                         paylikeVAR.email = document.querySelector("input[name=\"billing[email]\"]").value;
+                      }
                     }
 
                     if (!paylikeVAR.telephone || !paylikeVAR.telephone.trim()) {
@@ -290,13 +310,16 @@ if ( Mage::getStoreConfig( 'payment/paylike/status' ) ) {
 
                         review.onSave = function(transport) {
                           const response = transport.responseJSON || transport.responseText.evalJSON(true) || {};
+                          let message = "";
                           if (response.success || response.redirect) {
-                            PaylikeLogger.log("Order successfully saved");
+                            message = "Order successfully saved";
                           } else {
-                            PaylikeLogger.log("Failed to save order - " + response.error);
+                            message = "Failed to save order - " + response.error;
                           }
 
-                          oldOnSave(data);
+                          PaylikeLogger.log(message).then(() => {
+                            oldOnSave(transport);
+                          });
                         }
 
                         checkout.ajaxFailure = function (data) {
@@ -316,7 +339,11 @@ if ( Mage::getStoreConfig( 'payment/paylike/status' ) ) {
                     showError(message);
                 }
             } else {
+              if (oldPlaceOrder?.call) {
+                oldPlaceOrder();
+              } else {
                 review.oldSave();
+              }
             }
         }
     </script>

@@ -36,20 +36,20 @@ Under the extension settings, you can:
  * Update the payment method text in the payment gateways list
  * Update the payment method description in the payment gateways list
  * Update the credit card logos that you want to show (you can change which one you accept under the paylike account).
- * Update the title that shows up in the payment popup 
+ * Update the title that shows up in the payment popup
  * Update the popup description, choose whether you want to show the popup  (the cart conztents will show up instead)
  * Add test/live keys
  * Set payment mode (test/live)
  * Change the capture type (Instant/Delayed)
- 
+
 ## Payment management
 
 Since version 1.0.6 we now support the magento standard UI for orders. In short we support the Void, Invoice, and Credit memo available for any sale order processed via our payment gateway module. See more info for each case bellow.
- 
+
 ### Capture
- 
-* In *instant* mode, the authorization takes place via the popup, while the capturing is done on the server right on the order checkout page, so you don't need to capture after. 
-* In *delayed* mode you can capture payments by creating an invoice from the order in question from magento. Leave the capture online on to capture the payment automatically. 
+
+* In *instant* mode, the authorization takes place via the popup, while the capturing is done on the server right on the order checkout page, so you don't need to capture after.
+* In *delayed* mode you can capture payments by creating an invoice from the order in question from magento. Leave the capture online on to capture the payment automatically.
 
 ### Refund
 
@@ -58,5 +58,9 @@ Since version 1.0.6 we now support the magento standard UI for orders. In short 
 ### Void
 
 * In delayed mode, you can click void to void the payment if when this hasn't been captured, on the order interface screen.
- 
-  
+
+
+## Changelog
+
+#### 1.1.2:
+* Added compatibility with the Amasty Onestep Checkout plugin

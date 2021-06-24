@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
     <name>Paylike_Payment</name>
-    <version>1.1.1</version>
-    <stability>devel</stability>
+    <version>1.1.2</version>
+    <stability>stable</stability>
     <license>Massachusetts Institute of Technology License</license>
     <channel>community</channel>
     <extends/>
